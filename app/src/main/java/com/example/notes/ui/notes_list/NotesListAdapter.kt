@@ -1,27 +1,17 @@
 package com.example.notes.ui.notes_list
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.example.notes.R
 import kotlinx.android.synthetic.main.note_item.view.*
 
-class NotesListAdapter : RecyclerView.Adapter<NotesListAdapter.NotesListViewHolder>() {
+class NotesListAdapter() : RecyclerView.Adapter<NotesListAdapter.NotesListViewHolder>() {
 
-    val notes: List<Note> = listOf(
-        Note("Do Something", "16:49", "Any descriptionnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn"),
-        Note("Do Something", "16:49", "Any description"),
-        Note("Do Something", "16:49", "Any description"),
-        Note("Do Something", "16:49", "Any description"),
-        Note("Do Something", "16:49", "Any description"),
-        Note("Do Something", "16:49", "Any description"),
-        Note("Do Something", "16:49", "Any description"),
-        Note("Do Something", "16:49", "Any description"),
-        Note("Do Something", "16:49", "Any description"),
-        Note("Do Something", "16:49", "Any description"),
-        Note("Do Something", "16:49", "Any description"),
-    )
+    private var notesList: MutableList<Note> = mutableListOf()
 
     class NotesListViewHolder(view: View) : RecyclerView.ViewHolder(view)
 
@@ -32,8 +22,13 @@ class NotesListAdapter : RecyclerView.Adapter<NotesListAdapter.NotesListViewHold
     }
 
     override fun onBindViewHolder(holder: NotesListViewHolder, position: Int) {
-        val note = notes[position]
+        val note = notesList[position]
         holder.itemView.apply {
+            setOnClickListener {
+                findNavController().navigate(
+                    NotesListFragmentDirections.actionNotesListFragmentToNoteDetailsFragment(note)
+                )
+            }
             tvTitle.text = note.title
             tvTime.text = note.time
             tvDescription.text = note.description
@@ -41,12 +36,14 @@ class NotesListAdapter : RecyclerView.Adapter<NotesListAdapter.NotesListViewHold
     }
 
     override fun getItemCount(): Int {
-        return notes.size
+        return notesList.size
     }
-}
 
-data class Note(
-    val title: String,
-    val time: String,
-    val description: String
-)
+    @SuppressLint("NotifyDataSetChanged")
+    fun setList(notes: MutableList<Note>) {
+        notesList = notes
+        notifyDataSetChanged()
+    }
+
+
+}
