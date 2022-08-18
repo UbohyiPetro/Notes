@@ -18,6 +18,6 @@
         android:label="NoteDetailsFragment" >
         <argument
             android:name="note"
-            app:argType="com.example.notes.ui.notes_list.Note" />
+            app:argType="com.example.notes.ui.notes_list.model.Note" />
     </fragment>
 </navigation>

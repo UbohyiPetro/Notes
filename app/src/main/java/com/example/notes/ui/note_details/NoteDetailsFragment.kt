@@ -4,9 +4,11 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import com.example.notes.R
-import com.example.notes.ui.notes_list.Note
+import com.example.notes.ui.notes_list.model.Note
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.note_details_fragment.*
 
+@AndroidEntryPoint
 class NoteDetailsFragment : Fragment(R.layout.note_details_fragment) {
 
 

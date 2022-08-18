@@ -2,28 +2,45 @@ package com.example.notes.ui.notes_list
 
 import android.os.Bundle
 import android.view.View
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.coroutineScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.notes.R
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.notes_list_fragment.*
+import kotlinx.coroutines.launch
 import java.util.*
 
+@AndroidEntryPoint
 class NotesListFragment : Fragment(R.layout.notes_list_fragment) {
 
     private val notesViewModel: NotesViewModel by viewModels()
     private val notesListAdapter = NotesListAdapter()
 
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
+        observeNotes()
         setupItemTouchHelper()
-        notesListAdapter.setList(notesViewModel.notes)
-        fbAddNote.setOnClickListener {
-            val newNote = Note()
-            addNote(newNote)
-            notesListAdapter.notifyItemInserted(0)
+        setOnClickListenerForFloatingActionButton()
+    }
+
+    private fun observeNotes() {
+        lifecycle.coroutineScope.launch {
+            notesViewModel.notesViewState.collect { viewState ->
+                when {
+                    viewState.isLoading -> loadingState()
+                    viewState.notes.isEmpty() -> noDataState()
+                    viewState.notes.isNotEmpty() -> {
+                        loadedState()
+                        notesListAdapter.submitList(viewState.notes)
+                    }
+                }
+            }
         }
     }
 
@@ -39,7 +56,11 @@ class NotesListFragment : Fragment(R.layout.notes_list_fragment) {
             ): Boolean {
                 val startPosition = viewHolder.adapterPosition
                 val endPosition = target.adapterPosition
-                Collections.swap(notesViewModel.notes, startPosition, endPosition)
+                Collections.swap(
+                    notesViewModel.notesViewState.value.notes,
+                    startPosition,
+                    endPosition
+                )
                 notesListAdapter.notifyItemMoved(startPosition, endPosition)
                 return true
             }
@@ -49,6 +70,7 @@ class NotesListFragment : Fragment(R.layout.notes_list_fragment) {
                 when (direction) {
                     ItemTouchHelper.LEFT -> {
                         removeNote(position)
+
                     }
                     ItemTouchHelper.RIGHT -> {
                         removeNote(position)
@@ -57,9 +79,31 @@ class NotesListFragment : Fragment(R.layout.notes_list_fragment) {
             }
         }
 
+    private fun loadedState() {
+        rvNotes.isVisible = true
+        pbLoader.isVisible = false
+        tvError.isVisible = false
+    }
+
+    private fun noDataState() {
+        pbLoader.isVisible = false
+        rvNotes.isVisible = false
+        tvError.apply {
+            isVisible = true
+            text = "No Data"
+        }
+    }
+
+    private fun loadingState() {
+        rvNotes.isVisible = false
+        tvError.isVisible = false
+        pbLoader.isVisible = true
+    }
+
     private fun removeNote(position: Int) {
-        notesViewModel.notes.removeAt(position)
+        notesViewModel.deleteNote(notesViewModel.notesViewState.value.notes[position])
         notesListAdapter.notifyItemRemoved(position)
+
     }
 
     private fun setupRecyclerView() {
@@ -68,8 +112,8 @@ class NotesListFragment : Fragment(R.layout.notes_list_fragment) {
         }
     }
 
-    private fun addNote(newNote: Note) {
-        notesViewModel.notes.add(0, newNote)
+    private fun addNote() {
+        notesViewModel.addNote()
     }
 
     private fun setupItemTouchHelper() {
@@ -77,4 +121,9 @@ class NotesListFragment : Fragment(R.layout.notes_list_fragment) {
         itemTouchHelper.attachToRecyclerView(rvNotes)
     }
 
+    private fun setOnClickListenerForFloatingActionButton() {
+        fbAddNote.setOnClickListener {
+            addNote()
+        }
+    }
 }
