@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.notes.repository.NoteRepository
 import com.example.notes.repository.db.model.toNote
 import com.example.notes.ui.notes_list.model.Note
+import com.example.notes.ui.notes_list.model.toNoteEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,8 +14,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class NoteDetailsViewState(
-    val note: Note? = null,
-    val isLoading: Boolean = false
+    val note: Note = Note(0, "", "", ""),
+    val isLoading: Boolean = true
 )
 
 @HiltViewModel
@@ -38,4 +39,9 @@ class NoteDetailsViewModel @Inject constructor(
         }
     }
 
+    fun updateNote(note: Note) {
+        viewModelScope.launch {
+            noteRepository.updateNote(note.toNoteEntity())
+        }
+    }
 }

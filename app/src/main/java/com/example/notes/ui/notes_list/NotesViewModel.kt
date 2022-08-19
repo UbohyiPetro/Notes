@@ -45,10 +45,4 @@ class NotesViewModel @Inject constructor(
         }
     }
 
-    fun updateNote() {
-        viewModelScope.launch(Dispatchers.IO) {
-            noteRepository.updateNote(NoteEntity())
-        }
-    }
-
 }

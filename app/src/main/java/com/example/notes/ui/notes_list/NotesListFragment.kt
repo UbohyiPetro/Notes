@@ -55,14 +55,6 @@ class NotesListFragment : Fragment(R.layout.notes_list_fragment) {
                 viewHolder: RecyclerView.ViewHolder,
                 target: RecyclerView.ViewHolder
             ): Boolean {
-                val startPosition = viewHolder.adapterPosition
-                val endPosition = target.adapterPosition
-                Collections.swap(
-                    notesViewModel.notesViewState.value.notes,
-                    startPosition,
-                    endPosition
-                )
-                notesListAdapter.notifyItemMoved(startPosition, endPosition)
                 return true
             }
 
