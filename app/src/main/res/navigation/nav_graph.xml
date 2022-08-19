@@ -17,7 +17,7 @@
         android:name="com.example.notes.ui.note_details.NoteDetailsFragment"
         android:label="NoteDetailsFragment" >
         <argument
-            android:name="note"
-            app:argType="com.example.notes.ui.notes_list.model.Note" />
+            android:name="id"
+            app:argType="integer" />
     </fragment>
 </navigation>

@@ -37,7 +37,7 @@ class NotesListAdapter : ListAdapter<Note, NotesListAdapter.NotesViewHolder>(
         holder.itemView.apply {
             setOnClickListener {
                 findNavController().navigate(
-                    NotesListFragmentDirections.actionNotesListFragmentToNoteDetailsFragment(note)
+                    NotesListFragmentDirections.actionNotesListFragmentToNoteDetailsFragment(note.id)
                 )
             }
             tvTitle.text = note.title

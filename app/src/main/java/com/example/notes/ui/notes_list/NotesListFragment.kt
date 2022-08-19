@@ -6,6 +6,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.coroutineScope
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.notes.R
@@ -30,7 +31,7 @@ class NotesListFragment : Fragment(R.layout.notes_list_fragment) {
     }
 
     private fun observeNotes() {
-        lifecycle.coroutineScope.launch {
+        lifecycleScope.launch {
             notesViewModel.notesViewState.collect { viewState ->
                 when {
                     viewState.isLoading -> loadingState()
@@ -102,8 +103,6 @@ class NotesListFragment : Fragment(R.layout.notes_list_fragment) {
 
     private fun removeNote(position: Int) {
         notesViewModel.deleteNote(notesViewModel.notesViewState.value.notes[position])
-        notesListAdapter.notifyItemRemoved(position)
-
     }
 
     private fun setupRecyclerView() {
