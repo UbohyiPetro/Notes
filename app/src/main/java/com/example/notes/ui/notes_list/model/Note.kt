@@ -1,20 +1,21 @@
 package com.example.notes.ui.notes_list.model
 
 import com.example.notes.repository.db.model.NoteEntity
-import java.io.Serializable
+import java.text.SimpleDateFormat
+import java.util.*
 
 data class Note(
     val id: Int,
-    val title: String = "New Note",
-    val time: String = "16:49",
-    val description: String = "Any description"
-) : Serializable
+    val title: String,
+    val time: String,
+    val description: String
+)
 
 fun Note.toNoteEntity(): NoteEntity {
     return NoteEntity(
         id = id,
         title = title,
-        time = time,
+        time = SimpleDateFormat("hh:mm", Locale.getDefault()).parse(time).time,
         description = description
     )
 }
