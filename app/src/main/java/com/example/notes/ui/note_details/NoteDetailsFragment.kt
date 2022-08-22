@@ -35,21 +35,26 @@ class NoteDetailsFragment : Fragment(R.layout.note_details_fragment) {
             }
         }
         fbUpdate.setOnClickListener {
-            val oldNote = noteDetailsViewModel.viewState.value.note
-            val newNoteTitle = etTitle.text.toString()
-            val newNoteDescription = etDescription.text.toString()
-            if (oldNote.title != newNoteTitle || oldNote.description != newNoteDescription) {
-                val updatedNote = Note(
-                    id = oldNote.id,
-                    title = newNoteTitle,
-                    description = newNoteDescription,
-                    time = DateFormat.format("hh:mm", Date().time).toString()
-                )
-                noteDetailsViewModel.updateNote(updatedNote)
-            }
+            noteUpdate()
             findNavController().popBackStack()
         }
     }
+
+    private fun noteUpdate() {
+        val oldNote = noteDetailsViewModel.viewState.value.note
+        val newNoteTitle = etTitle.text.toString()
+        val newNoteDescription = etDescription.text.toString()
+        if (oldNote.title != newNoteTitle || oldNote.description != newNoteDescription) {
+            val updatedNote = Note(
+                id = oldNote.id,
+                title = newNoteTitle,
+                description = newNoteDescription,
+                time = DateFormat.format("hh:mm", Date().time).toString()
+            )
+            noteDetailsViewModel.updateNote(updatedNote)
+        }
+    }
+
 
     private fun loadingState() {
         pbNoteDetails.isVisible = true

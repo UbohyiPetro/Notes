@@ -2,6 +2,7 @@ package com.example.notes.ui.notes_list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.notes.helper.NetworkConnection
 import com.example.notes.repository.NoteRepository
 import com.example.notes.repository.db.model.NoteEntity
 import com.example.notes.repository.db.model.toNote
@@ -20,7 +21,8 @@ data class NotesViewState(
 
 @HiltViewModel
 class NotesViewModel @Inject constructor(
-    private val noteRepository: NoteRepository
+    private val noteRepository: NoteRepository,
+    private val networkConnection: NetworkConnection
 ) : ViewModel() {
 
     val notesViewState: StateFlow<NotesViewState> =
@@ -45,4 +47,5 @@ class NotesViewModel @Inject constructor(
         }
     }
 
+    fun networkConnection(): Flow<Boolean> = networkConnection.observeInternetConnection()
 }

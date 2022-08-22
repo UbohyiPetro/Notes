@@ -1,19 +1,22 @@
 package com.example.notes.ui.notes_list
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.Network
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.coroutineScope
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.notes.R
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.notes_list_fragment.*
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import java.util.*
 
 @AndroidEntryPoint
 class NotesListFragment : Fragment(R.layout.notes_list_fragment) {
@@ -26,6 +29,7 @@ class NotesListFragment : Fragment(R.layout.notes_list_fragment) {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
         observeNotes()
+        observeInternetConnection()
         setupItemTouchHelper()
         setOnClickListenerForFloatingActionButton()
     }
@@ -41,6 +45,14 @@ class NotesListFragment : Fragment(R.layout.notes_list_fragment) {
                         notesListAdapter.submitList(viewState.notes)
                     }
                 }
+            }
+        }
+    }
+
+    private fun observeInternetConnection() {
+        lifecycleScope.launch {
+            notesViewModel.networkConnection().collect {
+                Log.d("connection internet", it.toString())
             }
         }
     }
