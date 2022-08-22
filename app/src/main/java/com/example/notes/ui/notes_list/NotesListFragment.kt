@@ -1,11 +1,9 @@
 package com.example.notes.ui.notes_list
 
-import android.content.Context
-import android.net.ConnectivityManager
-import android.net.Network
+
 import android.os.Bundle
-import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -15,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.notes.R
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.notes_list_fragment.*
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -29,7 +26,6 @@ class NotesListFragment : Fragment(R.layout.notes_list_fragment) {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
         observeNotes()
-        observeInternetConnection()
         setupItemTouchHelper()
         setOnClickListenerForFloatingActionButton()
     }
@@ -39,20 +35,22 @@ class NotesListFragment : Fragment(R.layout.notes_list_fragment) {
             notesViewModel.notesViewState.collect { viewState ->
                 when {
                     viewState.isLoading -> loadingState()
-                    viewState.notes.isEmpty() -> noDataState()
+                    viewState.notes.isEmpty() && viewState.error == null -> errorState("No data")
                     viewState.notes.isNotEmpty() -> {
                         loadedState()
                         notesListAdapter.submitList(viewState.notes)
                     }
+                    viewState.error != null && viewState.notes.isEmpty() -> {
+                        errorState("No internet connection")
+                    }
+                    viewState.error != null -> {
+                        Toast.makeText(
+                            requireContext(),
+                            "No internet connection",
+                            Toast.LENGTH_SHORT
+                        )
+                    }
                 }
-            }
-        }
-    }
-
-    private fun observeInternetConnection() {
-        lifecycleScope.launch {
-            notesViewModel.networkConnection().collect {
-                Log.d("connection internet", it.toString())
             }
         }
     }
@@ -84,18 +82,19 @@ class NotesListFragment : Fragment(R.layout.notes_list_fragment) {
             }
         }
 
+
     private fun loadedState() {
         rvNotes.isVisible = true
         pbLoader.isVisible = false
         tvError.isVisible = false
     }
 
-    private fun noDataState() {
+    private fun errorState(error: String) {
         pbLoader.isVisible = false
         rvNotes.isVisible = false
         tvError.apply {
             isVisible = true
-            text = "No Data"
+            text = error
         }
     }
 

@@ -1,5 +1,6 @@
 package com.example.notes.ui.notes_list
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.notes.helper.NetworkConnection
@@ -12,11 +13,13 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 data class NotesViewState(
     val notes: List<Note> = emptyList(),
-    val isLoading: Boolean = true
+    val isLoading: Boolean = true,
+    val error: Throwable? = null,
 )
 
 @HiltViewModel
@@ -25,14 +28,29 @@ class NotesViewModel @Inject constructor(
     private val networkConnection: NetworkConnection
 ) : ViewModel() {
 
-    val notesViewState: StateFlow<NotesViewState> =
-        noteRepository.observeNotes().map { notesEntity ->
-            NotesViewState(
-                notes = notesEntity.map { noteEntity ->
-                    noteEntity.toNote()
-                }, isLoading = false
-            )
-        }.stateIn(viewModelScope, SharingStarted.Eagerly, NotesViewState())
+    private val fetchNotesState: MutableStateFlow<Throwable?> = MutableStateFlow(null)
+
+    init {
+        viewModelScope.launch {
+            val result = noteRepository.fetchAllNotes()
+            if (result.isFailure) {
+                fetchNotesState.value = result.exceptionOrNull()
+            }
+        }
+    }
+
+    val notesViewState = combine(
+        noteRepository.observeNotes(),
+        fetchNotesState
+    ) { notes, fetchException ->
+        NotesViewState(
+            isLoading = false,
+            error = fetchException,
+            notes = notes.map { noteEntity ->
+                noteEntity.toNote()
+            }
+        )
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, NotesViewState())
 
     fun deleteNote(note: Note) {
         viewModelScope.launch(Dispatchers.IO) {

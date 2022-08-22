@@ -7,8 +7,9 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class NoteRepository @Inject constructor(
-    private val noteDao: NoteDao
-) : NotesApi {
+    private val noteDao: NoteDao,
+    private val notesApi: NotesApi
+) {
 
     fun observeNotes(): Flow<List<NoteEntity>> = noteDao.observeAllNotes()
 
@@ -20,9 +21,6 @@ class NoteRepository @Inject constructor(
 
     suspend fun getNoteById(id: Int) = noteDao.getNoteById(id)
 
-    override suspend fun getAllNotes(): Boolean {
-        return true
-    }
-
+    suspend fun fetchAllNotes(): Result<Boolean> = notesApi.getAllNotes()
 
 }

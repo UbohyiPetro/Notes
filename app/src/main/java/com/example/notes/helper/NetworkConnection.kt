@@ -3,7 +3,6 @@ package com.example.notes.helper
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
-import android.util.Log
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
