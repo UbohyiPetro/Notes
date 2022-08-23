@@ -23,7 +23,7 @@ fun NoteEntity.toNote(): Note {
     return Note(
         id = id ?: -1,
         title = title,
-        time = DateFormat.format("hh:mm", Date(time)).toString(),
+        time = DateFormat.format("hh:mm d:MM:yyyy", Date(time)).toString(),
         description = description,
     )
 }

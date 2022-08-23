@@ -2,6 +2,9 @@ package com.example.notes.ui.note_details
 
 import android.os.Bundle
 import android.text.format.DateFormat
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -20,6 +23,11 @@ class NoteDetailsFragment : Fragment(R.layout.note_details_fragment) {
 
     private val noteDetailsViewModel: NoteDetailsViewModel by viewModels()
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         lifecycleScope.launch {
@@ -34,10 +42,21 @@ class NoteDetailsFragment : Fragment(R.layout.note_details_fragment) {
                 }
             }
         }
-        fbUpdate.setOnClickListener {
-            noteUpdate()
-            findNavController().popBackStack()
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.btUpdate -> {
+                noteUpdate()
+                findNavController().popBackStack()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.note_details, menu)
     }
 
     private fun noteUpdate() {
@@ -49,7 +68,7 @@ class NoteDetailsFragment : Fragment(R.layout.note_details_fragment) {
                 id = oldNote.id,
                 title = newNoteTitle,
                 description = newNoteDescription,
-                time = DateFormat.format("hh:mm", Date().time).toString()
+                time = DateFormat.format("hh:mm d:MM:yyyy", Date().time).toString()
             )
             noteDetailsViewModel.updateNote(updatedNote)
         }

@@ -15,7 +15,7 @@ fun Note.toNoteEntity(): NoteEntity {
     return NoteEntity(
         id = id,
         title = title,
-        time = SimpleDateFormat("hh:mm", Locale.getDefault()).parse(time).time,
+        time = SimpleDateFormat("hh:mm d:MM:yyyy", Locale.getDefault()).parse(time).time,
         description = description
     )
 }

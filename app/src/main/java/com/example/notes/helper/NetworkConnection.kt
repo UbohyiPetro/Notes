@@ -14,12 +14,13 @@ class NetworkConnection @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
 
-    private val _connectionState: MutableStateFlow<Boolean> = MutableStateFlow(true)
+
+    private val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    private val isNowConnected = cm.activeNetwork != null
+    private val _connectionState: MutableStateFlow<Boolean> = MutableStateFlow(isNowConnected)
 
     init {
-        val connection =
-            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        connection.registerDefaultNetworkCallback(object : ConnectivityManager.NetworkCallback() {
+        cm.registerDefaultNetworkCallback(object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) {
                 _connectionState.value = true
             }

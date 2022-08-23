@@ -32,9 +32,18 @@ class NotesViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val result = noteRepository.fetchAllNotes()
-            if (result.isFailure) {
-                fetchNotesState.value = result.exceptionOrNull()
+            networkConnection.observeInternetConnection().collect {
+                if (it) {
+                    val result = noteRepository.fetchAllNotes()
+                    if (result.isFailure) {
+                        fetchNotesState.value = result.exceptionOrNull()
+                    } else {
+                        fetchNotesState.value = null
+                    }
+                }
+                if (!it && fetchNotesState.value == null) {
+                    fetchNotesState.value = Throwable("No internet connection")
+                }
             }
         }
     }

@@ -2,12 +2,11 @@ package com.example.notes.repository.api
 
 import com.example.notes.helper.NetworkConnection
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collect
 import java.util.concurrent.CancellationException
 
 class NotesApiImpl constructor(
     private val networkConnection: NetworkConnection
-): NotesApi {
+) : NotesApi {
     override suspend fun getAllNotes(): Result<Boolean> {
         val apiCall = CoroutineScope(Dispatchers.IO).async {
             makeCall()
@@ -27,7 +26,7 @@ class NotesApiImpl constructor(
     }
 
     private suspend fun makeCall(): Boolean {
-        delay(10000)
+        delay(5000)
         return true
     }
 }
